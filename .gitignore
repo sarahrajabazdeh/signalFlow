@@ -1,0 +1,25 @@
+# Claude Code — personal workflow files (not team-shared)
+.claude/agents/
+.claude/skills/
+
+# Keep tracked:
+# - CLAUDE.md (project docs for Claude)
+# - .claude/settings.json (project permissions)
+
+# Go
+*.exe
+*.test
+*.out
+bin/
+vendor/
+
+# Environment
+.env
+.env.local
+
+# Docker
+.docker/
+
+# OS
+.DS_Store
+Thumbs.db
