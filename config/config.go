@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strconv"
 )
 
 // Config holds all environment-based configuration for signalFlow.
@@ -34,7 +35,7 @@ func Load() Config {
 		NATSURL:            getEnv("NATS_URL", "nats://localhost:4222"),
 		NATSStream:         getEnv("NATS_STREAM", "READINGS"),
 		NATSSubject:        getEnv("NATS_SUBJECT", "readings.ingest"),
-		ImbalanceThreshold: 0.20,
+		ImbalanceThreshold: parseFloat(getEnv("IMBALANCE_THRESHOLD", "0.20")),
 	}
 }
 
@@ -43,4 +44,12 @@ func getEnv(key, fallback string) string {
 		return val
 	}
 	return fallback
+}
+
+func parseFloat(s string) float64 {
+	val, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return 0.20
+	}
+	return val
 }
