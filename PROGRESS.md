@@ -7,9 +7,9 @@
 
 ## Current Status
 
-**→ Next step: Phase 2 — Database migrations**
+**→ Next step: Phase 4 — Consumer process**
 
-Tell Claude: `"build Phase 2 — database"`
+Tell Claude: `"build Phase 4 — consumer"`
 
 ---
 
@@ -18,9 +18,9 @@ Tell Claude: `"build Phase 2 — database"`
 | Phase | What | Status |
 |---|---|---|
 | 1 | Scaffold (docker-compose, go.mod, config, models) | ✅ Done |
-| 2 | Database migrations (PostgreSQL + ClickHouse) | 🔄 Next |
-| 3 | API process (chi router, handlers, NATS publish) | ⏳ Pending |
-| 4 | Consumer process (NATS subscribe, save to DBs, ACK) | ⏳ Pending |
+| 2 | Database migrations (PostgreSQL + ClickHouse) | ✅ Done |
+| 3 | API process (chi router, handlers, NATS publish) | ✅ Done |
+| 4 | Consumer process (NATS subscribe, save to DBs, ACK) | 🔄 Next |
 | 5 | Imbalance detection (actual < 80% expected → alert) | ⏳ Pending |
 | 6 | Verify end-to-end (/test-flow) | ⏳ Pending |
 
