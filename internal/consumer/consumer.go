@@ -3,6 +3,7 @@ package consumer
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
@@ -89,4 +90,34 @@ func (c *Consumer) process(ctx context.Context, msg *nats.Msg) {
 	}
 
 	msg.Ack()
+}
+
+// Run starts the pull-subscribe loop and blocks until ctx is cancelled.
+// A fetch timeout (no messages available) is normal idle behaviour — the loop continues.
+func (c *Consumer) Run(ctx context.Context) error {
+	c.log.Info().Msg("consumer loop starting")
+	for {
+		select {
+		case <-ctx.Done():
+			c.log.Info().Msg("consumer loop stopped")
+			return nil
+		default:
+		}
+
+		msgs, err := c.sub.Fetch(10, nats.MaxWait(5*time.Second))
+		if err != nil {
+			if errors.Is(err, nats.ErrTimeout) {
+				continue // no messages — normal when queue is empty
+			}
+			if ctx.Err() != nil {
+				return nil // context cancelled while waiting
+			}
+			c.log.Error().Err(err).Msg("fetch error")
+			continue
+		}
+
+		for _, msg := range msgs {
+			c.process(ctx, msg)
+		}
+	}
 }
