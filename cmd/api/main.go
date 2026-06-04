@@ -59,8 +59,11 @@ func main() {
 	r := api.NewRouter(pool, js, nc, cfg)
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%s", cfg.APIPort),
-		Handler: r,
+		Addr:         fmt.Sprintf(":%s", cfg.APIPort),
+		Handler:      r,
+		ReadTimeout:  10 * time.Second,  // max time to read the full request including body
+		WriteTimeout: 30 * time.Second,  // max time to write the full response
+		IdleTimeout:  120 * time.Second, // max time to keep idle keep-alive connections open
 	}
 
 	quit := make(chan os.Signal, 1)

@@ -1,4 +1,4 @@
-.PHONY: build test lint run-api run-consumer docker-up docker-down swagger migrate
+.PHONY: build test test-race lint run-api run-consumer docker-up docker-down swagger migrate
 
 build:
 	go build -o bin/api ./cmd/api/
@@ -6,6 +6,9 @@ build:
 
 test:
 	go test ./...
+
+test-race:
+	go test -race ./...
 
 lint:
 	golangci-lint run
