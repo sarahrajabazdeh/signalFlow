@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -45,7 +46,7 @@ func main() {
 		Name:     cfg.NATSStream,
 		Subjects: []string{cfg.NATSSubject},
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, nats.ErrStreamNameAlreadyInUse) {
 		log.Fatal().Err(err).Msg("create nats stream")
 	}
 
@@ -69,7 +70,7 @@ func main() {
 	<-quit
 	log.Info().Msg("shutting down gracefully")
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {
 		log.Error().Err(err).Msg("shutdown error")
