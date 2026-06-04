@@ -97,7 +97,10 @@ func TestProcess_HappyPath(t *testing.T) {
 		ActualOutput: 450,
 		RecordedAt:   time.Now().UTC(),
 	}
-	data, _ := json.Marshal(req)
+	data, err := json.Marshal(req)
+	if err != nil {
+		t.Fatalf("marshal request: %v", err)
+	}
 	if _, err := js.Publish("readings.test", data); err != nil {
 		t.Fatalf("publish: %v", err)
 	}
@@ -146,8 +149,11 @@ func TestProcess_Imbalance(t *testing.T) {
 		ActualOutput: 300,
 		RecordedAt:   time.Now().UTC(),
 	}
-	data, _ := json.Marshal(req)
-	if _, err := js.Publish("readings.test", data); err != nil {
+	data, err := json.Marshal(req)
+	if err != nil {
+		t.Fatalf("marshal request: %v", err)
+	}
+	if _, err = js.Publish("readings.test", data); err != nil {
 		t.Fatalf("publish: %v", err)
 	}
 	msgs, err := sub.Fetch(1, nats.MaxWait(2*time.Second))
@@ -196,8 +202,11 @@ func TestProcess_AssetNotFound(t *testing.T) {
 		ActualOutput: 450,
 		RecordedAt:   time.Now().UTC(),
 	}
-	data, _ := json.Marshal(req)
-	if _, err := js.Publish("readings.test", data); err != nil {
+	data, err := json.Marshal(req)
+	if err != nil {
+		t.Fatalf("marshal request: %v", err)
+	}
+	if _, err = js.Publish("readings.test", data); err != nil {
 		t.Fatalf("publish: %v", err)
 	}
 	msgs, err := sub.Fetch(1, nats.MaxWait(2*time.Second))

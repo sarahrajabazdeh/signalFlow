@@ -62,7 +62,10 @@ func (c *Consumer) process(ctx context.Context, msg *nats.Msg) {
 	}
 
 	if err := queries.SaveReading(ctx, c.ch, reading); err != nil {
-		c.log.Error().Err(err).Str("asset_id", req.AssetID.String()).Msg("failed to save reading")
+		c.log.Error().Err(err).
+			Str("asset_id", req.AssetID.String()).
+			Str("reading_id", reading.ID.String()).
+			Msg("failed to save reading")
 		msg.Nak()
 		return
 	}
@@ -77,7 +80,10 @@ func (c *Consumer) process(ctx context.Context, msg *nats.Msg) {
 			TriggeredAt:    time.Now().UTC(),
 		}
 		if err := queries.SaveAlert(ctx, c.pool, alert); err != nil {
-			c.log.Error().Err(err).Str("asset_id", req.AssetID.String()).Msg("failed to save alert")
+			c.log.Error().Err(err).
+				Str("asset_id", req.AssetID.String()).
+				Str("reading_id", reading.ID.String()).
+				Msg("failed to save alert")
 			// do not NAK — reading is already committed to ClickHouse
 		}
 	}
