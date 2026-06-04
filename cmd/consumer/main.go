@@ -71,4 +71,5 @@ func main() {
 	if err := c.Run(ctx); err != nil {
 		log.Fatal().Err(err).Msg("consumer error")
 	}
+	log.Info().Msg("consumer stopped")
 }

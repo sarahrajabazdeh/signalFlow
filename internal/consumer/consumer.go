@@ -112,6 +112,10 @@ func (c *Consumer) Run(ctx context.Context) error {
 			if ctx.Err() != nil {
 				return nil // context cancelled while waiting
 			}
+			if errors.Is(err, nats.ErrConnectionClosed) || errors.Is(err, nats.ErrBadSubscription) {
+				c.log.Error().Err(err).Msg("subscription lost")
+				return nil
+			}
 			c.log.Error().Err(err).Msg("fetch error")
 			continue
 		}
