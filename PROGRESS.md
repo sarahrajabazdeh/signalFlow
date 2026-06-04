@@ -7,9 +7,9 @@
 
 ## Current Status
 
-**→ Next step: Phase 5 — Imbalance detection end-to-end verification**
+**→ System complete.**
 
-Tell Claude: `"build Phase 5 — verify"`
+Run `./scripts/test-flow.sh` to verify the full pipeline end-to-end.
 
 ---
 
@@ -21,8 +21,8 @@ Tell Claude: `"build Phase 5 — verify"`
 | 2 | Database migrations (PostgreSQL + ClickHouse) | ✅ Done |
 | 3 | API process (chi router, handlers, NATS publish) | ✅ Done |
 | 4 | Consumer process (NATS subscribe, save to DBs, ACK) | ✅ Done |
-| 5 | Imbalance detection (actual < 80% expected → alert) | 🔄 Next |
-| 6 | Verify end-to-end (/test-flow) | ⏳ Pending |
+| 5 | Imbalance detection (actual < 80% expected → alert) | ✅ Done |
+| 6 | Verify end-to-end (/test-flow) | ✅ Done |
 
 ---
 
