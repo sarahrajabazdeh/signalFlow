@@ -14,15 +14,14 @@ import (
 
 func HandleCreateAsset(pool *pgxpool.Pool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1 MB limit
+		r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 		var req models.CreateAssetRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "invalid request body", http.StatusBadRequest)
+			writeError(w, http.StatusBadRequest, "invalid request body")
 			return
 		}
-
 		if req.Name == "" || req.ExpectedOutput <= 0 {
-			http.Error(w, "name and expected_output are required", http.StatusBadRequest)
+			writeError(w, http.StatusBadRequest, "name and expected_output are required")
 			return
 		}
 
@@ -32,9 +31,8 @@ func HandleCreateAsset(pool *pgxpool.Pool) http.HandlerFunc {
 			ExpectedOutput: req.ExpectedOutput,
 			CreatedAt:      time.Now().UTC(),
 		}
-
 		if err := queries.SaveAsset(r.Context(), pool, asset); err != nil {
-			http.Error(w, "failed to save asset", http.StatusInternalServerError)
+			writeError(w, http.StatusInternalServerError, "failed to save asset")
 			return
 		}
 

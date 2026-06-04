@@ -17,7 +17,7 @@ func HandleListAlerts(pool *pgxpool.Pool) http.HandlerFunc {
 		if raw := r.URL.Query().Get("asset_id"); raw != "" {
 			id, err := uuid.Parse(raw)
 			if err != nil {
-				http.Error(w, "invalid asset_id", http.StatusBadRequest)
+				writeError(w, http.StatusBadRequest, "invalid asset_id")
 				return
 			}
 			assetID = &id
@@ -25,7 +25,7 @@ func HandleListAlerts(pool *pgxpool.Pool) http.HandlerFunc {
 
 		alerts, err := queries.ListAlerts(r.Context(), pool, assetID)
 		if err != nil {
-			http.Error(w, "failed to list alerts", http.StatusInternalServerError)
+			writeError(w, http.StatusInternalServerError, "failed to list alerts")
 			return
 		}
 		if alerts == nil {

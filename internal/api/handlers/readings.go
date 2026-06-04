@@ -11,26 +11,24 @@ import (
 
 func HandleCreateReading(js nats.JetStreamContext, subject string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1 MB limit
+		r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 		var req models.CreateReadingRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "invalid request body", http.StatusBadRequest)
+			writeError(w, http.StatusBadRequest, "invalid request body")
 			return
 		}
-
 		if req.AssetID == uuid.Nil || req.ActualOutput < 0 || req.RecordedAt.IsZero() {
-			http.Error(w, "asset_id, actual_output, and recorded_at are required", http.StatusBadRequest)
+			writeError(w, http.StatusBadRequest, "asset_id, actual_output, and recorded_at are required")
 			return
 		}
 
 		data, err := json.Marshal(req)
 		if err != nil {
-			http.Error(w, "internal error", http.StatusInternalServerError)
+			writeError(w, http.StatusInternalServerError, "internal error")
 			return
 		}
-
 		if _, err := js.Publish(subject, data); err != nil {
-			http.Error(w, "failed to publish reading", http.StatusInternalServerError)
+			writeError(w, http.StatusInternalServerError, "failed to publish reading")
 			return
 		}
 
