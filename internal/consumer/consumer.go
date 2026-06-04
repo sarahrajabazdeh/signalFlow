@@ -10,11 +10,18 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nats-io/nats.go"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"signalflow/internal/db/queries"
 	"signalflow/internal/models"
 )
+
+var consumerMessagesProcessed = promauto.NewCounterVec(prometheus.CounterOpts{
+	Name: "consumer_messages_processed_total",
+	Help: "Total consumer messages processed, by outcome.",
+}, []string{"status"})
 
 // Consumer subscribes to NATS JetStream and processes meter reading events.
 type Consumer struct {
@@ -44,6 +51,7 @@ func (c *Consumer) process(ctx context.Context, msg *nats.Msg) {
 	if err := json.Unmarshal(msg.Data, &req); err != nil {
 		c.log.Warn().Err(err).Msg("invalid message payload")
 		msg.Nak()
+		consumerMessagesProcessed.WithLabelValues("nak").Inc()
 		return
 	}
 
@@ -51,6 +59,7 @@ func (c *Consumer) process(ctx context.Context, msg *nats.Msg) {
 	if err != nil {
 		c.log.Warn().Err(err).Str("asset_id", req.AssetID.String()).Msg("asset not found")
 		msg.Nak()
+		consumerMessagesProcessed.WithLabelValues("nak").Inc()
 		return
 	}
 
@@ -68,6 +77,7 @@ func (c *Consumer) process(ctx context.Context, msg *nats.Msg) {
 			Str("reading_id", reading.ID.String()).
 			Msg("failed to save reading")
 		msg.Nak()
+		consumerMessagesProcessed.WithLabelValues("nak").Inc()
 		return
 	}
 
@@ -90,6 +100,7 @@ func (c *Consumer) process(ctx context.Context, msg *nats.Msg) {
 	}
 
 	msg.Ack()
+	consumerMessagesProcessed.WithLabelValues("success").Inc()
 }
 
 // Run starts the pull-subscribe loop and blocks until ctx is cancelled.

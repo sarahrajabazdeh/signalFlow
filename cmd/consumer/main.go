@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"errors"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/nats-io/nats.go"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"signalflow/config"
@@ -64,6 +66,14 @@ func main() {
 		<-quit
 		log.Info().Msg("shutdown signal received")
 		cancel()
+	}()
+
+	go func() {
+		mux := http.NewServeMux()
+		mux.Handle("/metrics", promhttp.Handler())
+		if err := http.ListenAndServe(":9091", mux); err != nil {
+			log.Error().Err(err).Msg("metrics server error")
+		}
 	}()
 
 	log.Info().Msg("consumer starting")

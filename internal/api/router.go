@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nats-io/nats.go"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"signalflow/config"
 	"signalflow/internal/api/handlers"
 	apimid "signalflow/internal/api/middleware"
@@ -15,8 +16,10 @@ func NewRouter(pool *pgxpool.Pool, js nats.JetStreamContext, nc *nats.Conn, cfg 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(apimid.RequestID)
+	r.Use(apimid.Metrics)
 
 	r.Get("/health", handlers.HandleHealth(pool, nc))
+	r.Handle("/metrics", promhttp.Handler())
 	r.Post("/assets", handlers.HandleCreateAsset(pool))
 	r.Post("/readings", handlers.HandleCreateReading(js, cfg.NATSSubject))
 	r.Get("/alerts", handlers.HandleListAlerts(pool))
