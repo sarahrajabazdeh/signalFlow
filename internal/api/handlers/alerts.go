@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rs/zerolog/log"
 	"signalflow/internal/db/queries"
 	"signalflow/internal/models"
 )
@@ -32,6 +33,8 @@ func HandleListAlerts(pool *pgxpool.Pool) http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(alerts)
+		if err := json.NewEncoder(w).Encode(alerts); err != nil {
+			log.Error().Err(err).Msg("encode response")
+		}
 	}
 }
