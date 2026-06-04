@@ -50,7 +50,7 @@ func main() {
 		log.Fatal().Err(err).Msg("create nats stream")
 	}
 
-	r := api.NewRouter(pool, js, cfg)
+	r := api.NewRouter(pool, js, nc, cfg)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", cfg.APIPort),

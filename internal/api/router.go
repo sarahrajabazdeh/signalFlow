@@ -7,12 +7,14 @@ import (
 	"github.com/nats-io/nats.go"
 	"signalflow/config"
 	"signalflow/internal/api/handlers"
+	apimid "signalflow/internal/api/middleware"
 )
 
-func NewRouter(pool *pgxpool.Pool, js nats.JetStreamContext, cfg config.Config) *chi.Mux {
+func NewRouter(pool *pgxpool.Pool, js nats.JetStreamContext, nc *nats.Conn, cfg config.Config) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(apimid.RequestID)
 
 	r.Post("/assets", handlers.HandleCreateAsset(pool))
 	r.Post("/readings", handlers.HandleCreateReading(js, cfg.NATSSubject))
