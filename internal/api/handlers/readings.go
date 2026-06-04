@@ -9,6 +9,16 @@ import (
 	"signalflow/internal/models"
 )
 
+// HandleCreateReading submits a meter reading for async processing via NATS.
+//
+// @Summary      Submit a meter reading
+// @Tags         readings
+// @Accept       json
+// @Param        reading  body  models.CreateReadingRequest  true  "Meter reading"
+// @Success      202      "Accepted for async processing"
+// @Failure      400      {object}  map[string]string
+// @Failure      500      {object}  map[string]string
+// @Router       /readings [post]
 func HandleCreateReading(js nats.JetStreamContext, subject string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.Body = http.MaxBytesReader(w, r.Body, 1<<20)

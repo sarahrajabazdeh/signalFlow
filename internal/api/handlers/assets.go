@@ -12,6 +12,17 @@ import (
 	"signalflow/internal/models"
 )
 
+// HandleCreateAsset creates a new energy asset.
+//
+// @Summary      Create an asset
+// @Tags         assets
+// @Accept       json
+// @Produce      json
+// @Param        asset  body      models.CreateAssetRequest  true  "Asset to create"
+// @Success      201    {object}  models.Asset
+// @Failure      400    {object}  map[string]string
+// @Failure      500    {object}  map[string]string
+// @Router       /assets [post]
 func HandleCreateAsset(pool *pgxpool.Pool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.Body = http.MaxBytesReader(w, r.Body, 1<<20)

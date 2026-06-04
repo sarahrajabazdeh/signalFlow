@@ -1,3 +1,9 @@
+// @title           signalFlow API
+// @version         1.0
+// @description     Real-time energy event processing — ingest meter readings and detect imbalance alerts.
+// @host            localhost:8080
+// @BasePath        /
+
 package main
 
 import (

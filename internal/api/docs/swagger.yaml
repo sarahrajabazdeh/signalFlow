@@ -1,0 +1,173 @@
+basePath: /
+definitions:
+  handlers.healthResponse:
+    properties:
+      nats:
+        type: string
+      postgres:
+        type: string
+      status:
+        type: string
+    type: object
+  models.Alert:
+    properties:
+      actual_output:
+        type: number
+      asset_id:
+        type: string
+      deviation_pct:
+        description: e.g. 0.35 means 35% below
+        type: number
+      expected_output:
+        type: number
+      id:
+        type: string
+      triggered_at:
+        type: string
+    type: object
+  models.Asset:
+    properties:
+      created_at:
+        type: string
+      expected_output:
+        description: in kW
+        type: number
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  models.CreateAssetRequest:
+    properties:
+      expected_output:
+        type: number
+      name:
+        type: string
+    type: object
+  models.CreateReadingRequest:
+    properties:
+      actual_output:
+        type: number
+      asset_id:
+        type: string
+      recorded_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Real-time energy event processing — ingest meter readings and detect
+    imbalance alerts.
+  title: signalFlow API
+  version: "1.0"
+paths:
+  /alerts:
+    get:
+      parameters:
+      - description: Filter by asset UUID
+        in: query
+        name: asset_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Alert'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List imbalance alerts
+      tags:
+      - alerts
+  /assets:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Asset to create
+        in: body
+        name: asset
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create an asset
+      tags:
+      - assets
+  /health:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.healthResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/handlers.healthResponse'
+      summary: Health check
+      tags:
+      - health
+  /readings:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Meter reading
+        in: body
+        name: reading
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateReadingRequest'
+      responses:
+        "202":
+          description: Accepted for async processing
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Submit a meter reading
+      tags:
+      - readings
+swagger: "2.0"

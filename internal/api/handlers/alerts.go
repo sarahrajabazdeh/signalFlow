@@ -11,6 +11,16 @@ import (
 	"signalflow/internal/models"
 )
 
+// HandleListAlerts returns all alerts, optionally filtered by asset.
+//
+// @Summary      List imbalance alerts
+// @Tags         alerts
+// @Produce      json
+// @Param        asset_id  query     string  false  "Filter by asset UUID"
+// @Success      200       {array}   models.Alert
+// @Failure      400       {object}  map[string]string
+// @Failure      500       {object}  map[string]string
+// @Router       /alerts [get]
 func HandleListAlerts(pool *pgxpool.Pool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var assetID *uuid.UUID
