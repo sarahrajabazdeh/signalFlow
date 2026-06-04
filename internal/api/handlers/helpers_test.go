@@ -2,6 +2,7 @@ package handlers_test
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -32,9 +33,15 @@ func testJetStream(t *testing.T) nats.JetStreamContext {
 	if err != nil {
 		t.Fatalf("jetstream context: %v", err)
 	}
-	js.AddStream(&nats.StreamConfig{
+	_, err = js.AddStream(&nats.StreamConfig{
 		Name:     "READINGS_TEST",
 		Subjects: []string{"readings.test"},
 	})
+	if err != nil {
+		// stream may already exist — that's fine, anything else is a setup failure
+		if !strings.Contains(err.Error(), "stream name already in use") {
+			t.Fatalf("create test stream: %v", err)
+		}
+	}
 	return js
 }
