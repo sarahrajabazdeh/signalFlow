@@ -45,3 +45,13 @@ func testJetStream(t *testing.T) nats.JetStreamContext {
 	}
 	return js
 }
+
+func testNATSConn(t *testing.T) *nats.Conn {
+	t.Helper()
+	nc, err := nats.Connect("nats://localhost:4222")
+	if err != nil {
+		t.Skipf("nats not available: %v", err)
+	}
+	t.Cleanup(func() { nc.Close() })
+	return nc
+}

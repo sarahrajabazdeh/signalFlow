@@ -16,6 +16,7 @@ func NewRouter(pool *pgxpool.Pool, js nats.JetStreamContext, nc *nats.Conn, cfg 
 	r.Use(middleware.Recoverer)
 	r.Use(apimid.RequestID)
 
+	r.Get("/health", handlers.HandleHealth(pool, nc))
 	r.Post("/assets", handlers.HandleCreateAsset(pool))
 	r.Post("/readings", handlers.HandleCreateReading(js, cfg.NATSSubject))
 	r.Get("/alerts", handlers.HandleListAlerts(pool))
