@@ -1,0 +1,19 @@
+linters:
+  enable:
+    - errcheck
+    - govet
+    - staticcheck
+    - gofmt
+    - goimports
+    - gosimple
+    - unused
+
+linters-settings:
+  goimports:
+    local-prefixes: signalflow
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
