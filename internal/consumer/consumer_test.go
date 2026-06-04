@@ -2,6 +2,7 @@ package consumer
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"testing"
 
@@ -43,10 +44,13 @@ func testJetStream(t *testing.T) nats.JetStreamContext {
 	if err != nil {
 		t.Fatalf("jetstream context: %v", err)
 	}
-	js.AddStream(&nats.StreamConfig{
+	_, err = js.AddStream(&nats.StreamConfig{
 		Name:     "READINGS_TEST",
 		Subjects: []string{"readings.test"},
 	})
+	if err != nil && !errors.Is(err, nats.ErrStreamNameAlreadyInUse) {
+		t.Fatalf("add test stream: %v", err)
+	}
 	return js
 }
 
