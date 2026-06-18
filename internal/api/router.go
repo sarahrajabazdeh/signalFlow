@@ -20,12 +20,19 @@ func NewRouter(pool *pgxpool.Pool, js nats.JetStreamContext, nc *nats.Conn, cfg 
 	r.Use(apimid.RequestID)
 	r.Use(apimid.Metrics)
 
+	// public routes — no token required
 	r.Get("/health", handlers.HandleHealth(pool, nc))
 	r.Handle("/metrics", promhttp.Handler())
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
-	r.Post("/assets", handlers.HandleCreateAsset(pool))
-	r.Post("/readings", handlers.HandleCreateReading(js, cfg.NATSSubject))
-	r.Get("/alerts", handlers.HandleListAlerts(pool))
+	r.Post("/token", handlers.HandleToken(cfg.JWTSecret, cfg.APIKey))
+
+	// protected routes — valid JWT required
+	r.Group(func(r chi.Router) {
+		r.Use(apimid.Auth(cfg.JWTSecret))
+		r.Post("/assets", handlers.HandleCreateAsset(pool))
+		r.Post("/readings", handlers.HandleCreateReading(js, cfg.NATSSubject))
+		r.Get("/alerts", handlers.HandleListAlerts(pool))
+	})
 
 	return r
 }

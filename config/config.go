@@ -24,6 +24,10 @@ type Config struct {
 
 	// Imbalance detection threshold (default 0.20 = 20%)
 	ImbalanceThreshold float64
+
+	// Auth
+	JWTSecret string
+	APIKey    string
 }
 
 // Load reads config from environment variables with sensible defaults for local dev.
@@ -36,6 +40,8 @@ func Load() Config {
 		NATSStream:         getEnv("NATS_STREAM", "READINGS"),
 		NATSSubject:        getEnv("NATS_SUBJECT", "readings.ingest"),
 		ImbalanceThreshold: parseFloat(getEnv("IMBALANCE_THRESHOLD", "0.20")),
+		JWTSecret:          getEnv("JWT_SECRET", "dev-secret-change-in-production"),
+		APIKey:             getEnv("API_KEY", "dev-api-key"),
 	}
 }
 
